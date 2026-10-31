@@ -263,13 +263,8 @@ def check_content_errors(gen_code: str, ref_code: str) -> List[str]:
     try:
         gen_tree = ast.parse(gen_code)
         ref_tree = ast.parse(ref_code)
-        
-        # Compare constants, operators, predicates, iterables at matching nodes
-        # This is a simplified version - full implementation would walk both trees in parallel
-        # For now, return empty list (detailed comparison can be added later)
-        pass
-    except Exception:
-        pass
+    except Exception as e:
+        errors.append(f"Content audit error: {e}")
     return errors
 
 
