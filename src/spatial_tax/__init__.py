@@ -1,0 +1,1 @@
+"""Spatial Tax package initialization."""
