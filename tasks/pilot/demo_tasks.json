@@ -1,0 +1,102 @@
+[
+  {
+    "task_id": "demo_d1_000",
+    "depth": 1,
+    "spec_text": "# Specification:\n# Function process_data(data) with nesting depth 1.\n#   Level 1: for v1 in data\n#     Statement 1: add 57 to total\n#     Statement 2: multiply total by 28\n#     Statement 3: add 22 to total\n# Final: return total",
+    "signature_a": "def process_data(data):",
+    "signature_bc": "def process_data(data) {",
+    "canonical_python": "def process_data(data):\n    total = 0\n    for v1 in data:\n        total += 57\n        total *= 28\n        total += 22\n    return total",
+    "constants_used": [
+      57,
+      28,
+      22
+    ],
+    "unit_test_inputs": [
+      [],
+      [
+        1,
+        2,
+        3
+      ],
+      [
+        -1,
+        5,
+        0,
+        2
+      ]
+    ],
+    "regeneration_count": 0,
+    "mutant_catch_rate": 1.0,
+    "total_mutants": 1,
+    "caught_mutants": 1
+  },
+  {
+    "task_id": "demo_d2_001",
+    "depth": 2,
+    "spec_text": "# Specification:\n# Function process_data(data) with nesting depth 2.\n#   Level 1: if len(data) > 0\n#     Statement 1: multiply total by 8\n#     Statement 2: add 92 to total\n#     Level 2: for v1 in data\n#       Statement 1: subtract 61 from total\n#       Statement 2: multiply total by 34\n#     Post-exit statement after level 2 block ends: add 33 to total\n# Final: return total",
+    "signature_a": "def process_data(data):",
+    "signature_bc": "def process_data(data) {",
+    "canonical_python": "def process_data(data):\n    total = 0\n    if len(data) > 0:\n        total *= 8\n        total += 92\n        for v1 in data:\n            total -= 61\n            total *= 34\n        total += 33\n    return total",
+    "constants_used": [
+      8,
+      92,
+      33,
+      61,
+      34
+    ],
+    "unit_test_inputs": [
+      [],
+      [
+        1,
+        2,
+        3
+      ],
+      [
+        -1,
+        5,
+        0,
+        2
+      ]
+    ],
+    "regeneration_count": 1,
+    "mutant_catch_rate": 1.0,
+    "total_mutants": 3,
+    "caught_mutants": 3
+  },
+  {
+    "task_id": "demo_d3_002",
+    "depth": 3,
+    "spec_text": "# Specification:\n# Function process_data(data) with nesting depth 3.\n#   Level 1: if len(data) > 0\n#     Statement 1: subtract 61 from total\n#     Statement 2: multiply total by 36\n#     Level 2: for v1 in data\n#       Statement 1: multiply total by 47\n#       Statement 2: subtract 54 from total\n#       Level 3: if v1 > 0\n#         Statement 1: multiply total by 21\n#         Statement 2: multiply total by 25\n#       Post-exit statement after level 3 block ends: subtract 27 from total\n#     Post-exit statement after level 2 block ends: subtract 50 from total\n# Final: return total",
+    "signature_a": "def process_data(data):",
+    "signature_bc": "def process_data(data) {",
+    "canonical_python": "def process_data(data):\n    total = 0\n    if len(data) > 0:\n        total -= 61\n        total *= 36\n        for v1 in data:\n            total *= 47\n            total -= 54\n            if v1 > 0:\n                total *= 21\n                total *= 25\n            total -= 27\n        total -= 50\n    return total",
+    "constants_used": [
+      61,
+      36,
+      50,
+      47,
+      54,
+      27,
+      21,
+      25
+    ],
+    "unit_test_inputs": [
+      [],
+      [
+        1,
+        2,
+        3
+      ],
+      [
+        -1,
+        5,
+        0,
+        2
+      ]
+    ],
+    "regeneration_count": 2,
+    "mutant_catch_rate": 1.0,
+    "total_mutants": 5,
+    "caught_mutants": 5
+  }
+]

@@ -100,4 +100,7 @@ Desktop.ini
 
 # User specified
 models/
-tasks/
+tasks/*
+!tasks/pilot/
+tasks/pilot/*
+!tasks/pilot/*.json
