@@ -21,9 +21,21 @@ if __name__ == "__main__" and __package__ is None:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 try:
-    from src.spatial_tax.converter import convert_brace_to_python, ConversionError, ConversionResult
+    from src.spatial_tax.converter import (
+        convert_brace_to_python,
+        python_to_condition_b,
+        python_to_condition_c,
+        ConversionError,
+        ConversionResult,
+    )
 except ImportError:
-    from converter import convert_brace_to_python, ConversionError, ConversionResult
+    from converter import (
+        convert_brace_to_python,
+        python_to_condition_b,
+        python_to_condition_c,
+        ConversionError,
+        ConversionResult,
+    )
 
 
 class Category(Enum):
@@ -427,9 +439,10 @@ def run_scorer_self_test(reference_tasks: List[dict]) -> dict:
         for condition in ['A', 'B', 'C']:
             if condition == 'A':
                 gen = canonical
-            else:
-                # Convert canonical to B/C syntax for testing
-                gen = python_to_brace(canonical)
+            elif condition == 'B':
+                gen = python_to_condition_b(canonical)
+            else:  # condition == 'C'
+                gen = python_to_condition_c(canonical)
             
             result = score_generation(gen, canonical, condition)
             passed = (result.category == Category.STRUCTURALLY_CORRECT)
@@ -478,55 +491,8 @@ def run_scorer_self_test(reference_tasks: List[dict]) -> dict:
     return results
 
 
-def python_to_brace(canonical_python: str) -> str:
-    """Convert canonical Python to B/C brace syntax for testing."""
-    lines = canonical_python.splitlines()
-    output = []
-    depth = 0
-    prev_indent = 0
-    
-    for line in lines:
-        stripped = line.strip()
-        if not stripped:
-            continue
-        
-        # Calculate current indent level
-        indent = len(line) - len(line.lstrip())
-        indent_level = indent // 4
-        
-        # Close blocks if we've dedented
-        while indent_level < depth:
-            depth -= 1
-            close_indent = '    ' * depth
-            output.append(f'{close_indent}}}')
-        
-        if stripped.startswith('def process_data(data):'):
-            output.append('def process_data(data) {')
-            depth = 1
-        elif stripped.endswith(':'):
-            # Block header - at current depth, then increase for body
-            header = stripped[:-1]  # Remove ':'
-            header_indent = '    ' * depth
-            output.append(f'{header_indent}{header} {{')
-            depth += 1
-        elif stripped == 'return total':
-                    # Return is at current depth (function body level)
-                    return_indent = '    ' * depth
-                    output.append(f'{return_indent}return total')
-        else:
-            # Statement - indent at current depth
-            stmt_indent = '    ' * depth
-            output.append(f'{stmt_indent}{stripped}')
-        
-        prev_indent = indent
-    
-    # Close any remaining open blocks
-    while depth > 0:
-        depth -= 1
-        close_indent = '    ' * depth
-        output.append(f'{close_indent}}}')
-    
-    return '\n'.join(output)
+# Alias for backward compatibility
+python_to_brace = python_to_condition_b
 
 
 def main():
