@@ -266,12 +266,119 @@ def run_determinism_check(
     return audit_summary
 
 
+def run_pilot_inference(
+    runner: ModelRunner,
+    test_tasks_path: Path,
+    demo_tasks_path: Path,
+    output_path: Optional[Path] = None,
+) -> Dict[str, Any]:
+    """
+    Execute full pilot model inference across all 3 conditions (§5):
+    - 90 evaluation tasks (30 each for d in {1, 3, 5}).
+    - 3 conditions: A, B, C.
+    - 270 total model generations in greedy decoding mode (max_new_tokens=512, seed=42).
+    - Records raw generations, token sequences, and SHA-256 hashes.
+    """
+    with open(demo_tasks_path, encoding="utf-8") as f:
+        demo_payload = json.load(f)
+    demos = demo_payload if isinstance(demo_payload, list) else demo_payload.get("tasks", [])
+
+    with open(test_tasks_path, encoding="utf-8") as f:
+        test_payload = json.load(f)
+    tasks = test_payload if isinstance(test_payload, list) else test_payload.get("tasks", [])
+
+    if len(tasks) != 90:
+        raise ValueError(f"Expected 90 evaluation tasks per §3, found {len(tasks)}")
+
+    git_commit = get_git_commit_hash()
+    timestamp_start = datetime.now(timezone.utc).isoformat()
+
+    print("\n" + "=" * 70)
+    print(f"STARTING OFFICIAL PILOT INFERENCE (§5): {len(tasks)} tasks × 3 conditions = {len(tasks) * 3} generations")
+    print(f"Git Commit: {git_commit}")
+    print("=" * 70)
+
+    records = []
+    total_generations = len(tasks) * len(PINNED_CONDITIONS)
+    gen_idx = 0
+
+    for task in tasks:
+        task_id = task["task_id"]
+        depth = task["depth"]
+
+        for condition in PINNED_CONDITIONS:
+            gen_idx += 1
+            prompt_text = build_prompt(demos, task, condition)
+            prompt_hash = sha256_text(prompt_text)
+
+            print(f"[{gen_idx:03d}/{total_generations:03d}] Task {task_id} (d={depth}, Cond {condition})...", end="", flush=True)
+
+            gen_result = runner.generate(prompt_text)
+
+            record = {
+                "task_id": task_id,
+                "depth": depth,
+                "condition": condition,
+                "prompt_sha256": prompt_hash,
+                "prompt_text": prompt_text,
+                "output_sha256": gen_result["output_sha256"],
+                "output_token_count": gen_result["output_token_count"],
+                "output_tokens": gen_result["output_tokens"],
+                "output_raw": gen_result["output_raw"],
+                "generation_time_sec": gen_result["generation_time_sec"],
+            }
+            records.append(record)
+
+            print(f" -> {gen_result['output_token_count']} tokens ({gen_result['generation_time_sec']:.2f}s)")
+
+    timestamp_end = datetime.now(timezone.utc).isoformat()
+
+    summary = {
+        "metadata": {
+            "pilot": "H2 Spatial Tax Pilot",
+            "git_commit": git_commit,
+            "timestamp_start": timestamp_start,
+            "timestamp_end": timestamp_end,
+            "model_name": PINNED_MODEL_NAME,
+            "model_revision": PINNED_REVISION,
+            "precision": "bfloat16",
+            "cpu_threads": runner.threads,
+            "seed": PINNED_SEED,
+            "max_new_tokens": PINNED_MAX_NEW_TOKENS,
+            "total_tasks": len(tasks),
+            "total_generations": len(records),
+            "conditions": PINNED_CONDITIONS,
+        },
+        "generations": records,
+    }
+
+    if output_path:
+        out_p = Path(output_path)
+        out_p.parent.mkdir(parents=True, exist_ok=True)
+        with open(out_p, "w", encoding="utf-8") as f:
+            json.dump(summary, f, indent=2)
+        print(f"\nRaw generations saved to: {out_p}")
+
+    return summary
+
+
 def main():
     parser = argparse.ArgumentParser(description="Model Inference and Determinism Runner per §4 & §5.")
     parser.add_argument(
         "--determinism-check",
         action="store_true",
         help="Run pre-run determinism check on 3 demonstration tasks (9 prompts × 3 runs).",
+    )
+    parser.add_argument(
+        "--run-pilot",
+        action="store_true",
+        help="Execute official pilot inference on test tasks across all 3 conditions (270 generations).",
+    )
+    parser.add_argument(
+        "--test-tasks",
+        type=str,
+        default="tasks/pilot/test_tasks.json",
+        help="Path to evaluation test tasks JSON file (default: tasks/pilot/test_tasks.json).",
     )
     parser.add_argument(
         "--repetitions",
@@ -309,8 +416,21 @@ def main():
             repetitions=args.repetitions,
             output_path=output_report,
         )
+    elif args.run_pilot:
+        test_path = Path(args.test_tasks)
+        if not test_path.is_absolute():
+            test_path = PROJECT_ROOT / test_path
+        output_file = Path(args.output_dir) / "raw_generations.json"
+        if not output_file.is_absolute():
+            output_file = PROJECT_ROOT / output_file
+        run_pilot_inference(
+            runner=runner,
+            test_tasks_path=test_path,
+            demo_tasks_path=demo_path,
+            output_path=output_file,
+        )
     else:
-        print("Model loaded successfully. Specify --determinism-check to execute pre-run verification.")
+        print("Model loaded successfully. Specify --determinism-check or --run-pilot to execute inference.")
 
 
 if __name__ == "__main__":
