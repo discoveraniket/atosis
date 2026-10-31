@@ -60,9 +60,11 @@ def get_git_commit_hash() -> str:
             cwd=str(PROJECT_ROOT),
             text=True
         ).strip()
+        if not commit or len(commit) < 7:
+            raise ValueError(f"Invalid Git commit hash: '{commit}'")
         return commit
-    except Exception:
-        return "unknown"
+    except Exception as e:
+        raise RuntimeError(f"Failed to retrieve Git commit hash per Guideline §6.1: {e}") from e
 
 
 def sha256_text(text: str) -> str:
