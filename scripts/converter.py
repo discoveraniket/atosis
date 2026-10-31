@@ -123,6 +123,12 @@ def convert_brace_to_python(generated_text: str) -> ConversionResult:
                 # Braces in statement -> will cause syntax error in Python
                 pass  # Leave as-is, Python parser will reject
             
+            # Check for Python-style header in B/C (block header without '{}')
+            # This is a line that looks like a block header but doesn't end with '{}'
+            # and is not a simple assignment/return
+            if (content.startswith('if ') or content.startswith('for ')) and content.endswith(':'):
+                errors.append(ConversionError.E_HEADER_SYNTAX)
+            
             indent = '    ' * depth
             output_lines.append(f"{indent}{content}")
     
