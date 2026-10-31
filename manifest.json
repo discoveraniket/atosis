@@ -105,7 +105,7 @@
     "seed": 42,
     "determinism_check": "Run 3 demonstration tasks across all 3 conditions (9 prompts) three times; all outputs must be identical"
   },
-  "external_timestamp_doi": null,
+  "external_timestamp_doi": "https://doi.org/10.5281/zenodo.23844168",
   "created_at": "2026-10-31T11:19:15.549314Z",
   "git_commit": null
 }
