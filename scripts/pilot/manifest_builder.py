@@ -51,29 +51,23 @@ def get_tokenizer_file_info(snapshot_dir: Path) -> List[Dict[str, Any]]:
     files_info = []
     for fname in TOKENIZER_FILES:
         fpath = snapshot_dir / fname
-        if fpath.exists():
-            stat = fpath.stat()
-            files_info.append({
-                "filename": fname,
-                "size_bytes": stat.st_size,
-                "sha256": compute_sha256(fpath),
-            })
-        else:
-            files_info.append({
-                "filename": fname,
-                "size_bytes": None,
-                "sha256": None,
-                "error": "File not found"
-            })
+        if not fpath.exists():
+            raise FileNotFoundError(f"Required tokenizer file missing: {fpath}")
+        stat = fpath.stat()
+        files_info.append({
+            "filename": fname,
+            "size_bytes": stat.st_size,
+            "sha256": compute_sha256(fpath),
+        })
     return files_info
 
 
 def get_safetensors_sha256(snapshot_dir: Path) -> str:
     """Get SHA-256 of model.safetensors."""
     fpath = snapshot_dir / SAFETENSORS_FILE
-    if fpath.exists():
-        return compute_sha256(fpath)
-    return "FILE_NOT_FOUND"
+    if not fpath.exists():
+        raise FileNotFoundError(f"Model weights file missing: {fpath}")
+    return compute_sha256(fpath)
 
 
 def get_environment_info() -> Dict[str, Any]:
@@ -169,8 +163,13 @@ def verify_manifest(manifest_path: Path = Path("manifest.json")) -> bool:
     
     for field in required_fields:
         if field not in data:
-            print(f"MISSING FIELD: {field}")
-            return False
+            raise KeyError(f"Manifest verification failed: missing field '{field}'")
+
+    if not data["model_safetensors_sha256"] or len(data["model_safetensors_sha256"]) != 64:
+        raise ValueError(f"Manifest verification failed: invalid safetensors SHA-256: {data['model_safetensors_sha256']}")
+
+    if len(data.get("tokenizer_files", [])) < 6:
+        raise ValueError(f"Manifest verification failed: expected 6 tokenizer files, found {len(data.get('tokenizer_files', []))}")
     
     print("Manifest verification: PASSED")
     print(f"  Model revision: {data['model']['revision']}")
