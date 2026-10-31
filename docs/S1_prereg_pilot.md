@@ -3,8 +3,8 @@
 | Field | Value |
 | :---- | :---- |
 | Version | 1.0 |
-| Date written | 2026-10-31 |
-| Status | Draft. Not frozen. Freeze before generating any task. |
+| Date written | 2026-11-01 |
+| Status | Frozen. Pre-registration locked before task and model generation. |
 | Researcher | Independent (no institution) |
 | Target model | `Qwen/Qwen2.5-Coder-1.5B-Instruct` |
 | Model revision (commit hash) | `2e1fd397ee46e1388853d2af2c993145b0f1098a` |
@@ -289,3 +289,4 @@ After the freeze, any change to conditions, tasks, prompts, metrics, or threshol
 | Date | Version | Change |
 | :---- | :---- | :---- |
 | 2026-10-31 | 1.0 | Initial version. |
+| 2026-11-01 | 1.0 | Frozen pre-registration specification locked before task and model generation per Section 12. |

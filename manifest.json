@@ -1,8 +1,8 @@
 {
   "pilot": "H2 Spatial Tax Pilot",
   "pre_registration_version": "1.0",
-  "pre_registration_date": "2026-10-31",
-  "status": "Draft",
+  "pre_registration_date": "2026-11-01",
+  "status": "Frozen",
   "model": {
     "name": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
     "revision": "2e1fd397ee46e1388853d2af2c993145b0f1098a",
