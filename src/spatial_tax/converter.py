@@ -146,6 +146,68 @@ def convert_brace_to_python(generated_text: str) -> ConversionResult:
     )
 
 
+def python_to_condition_b(canonical_python: str) -> str:
+    """
+    Convert canonical Python to Condition B (braces with indentation per §2).
+    """
+    lines = canonical_python.splitlines()
+    output = []
+    depth = 0
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+
+        indent = len(line) - len(line.lstrip())
+        indent_level = indent // 4
+
+        # Close blocks if we have dedented
+        while indent_level < depth:
+            depth -= 1
+            close_indent = '    ' * depth
+            output.append(f"{close_indent}}}")
+
+        if stripped.startswith('def process_data(data):'):
+            output.append('def process_data(data) {')
+            depth = 1
+        elif stripped.endswith(':'):
+            header = stripped[:-1]  # Remove trailing ':'
+            header_indent = '    ' * depth
+            output.append(f"{header_indent}{header} {{")
+            depth += 1
+        elif stripped == 'return total':
+            return_indent = '    ' * depth
+            output.append(f"{return_indent}return total")
+        else:
+            stmt_indent = '    ' * depth
+            output.append(f"{stmt_indent}{stripped}")
+
+    while depth > 0:
+        depth -= 1
+        close_indent = '    ' * depth
+        output.append(f"{close_indent}}}")
+
+    return '\n'.join(output)
+
+
+def condition_b_to_condition_c(b_code: str) -> str:
+    """
+    Convert Condition B to Condition C (braces, no indentation per §2 & §8).
+    Condition C equals Condition B with leading whitespace removed from every line.
+    """
+    return '\n'.join(line.lstrip() for line in b_code.splitlines())
+
+
+def python_to_condition_c(canonical_python: str) -> str:
+    """Convert canonical Python directly to Condition C."""
+    return condition_b_to_condition_c(python_to_condition_b(canonical_python))
+
+
+# Alias for backward compatibility
+python_to_brace = python_to_condition_b
+
+
 def convert_condition_a(generated_text: str) -> ConversionResult:
     """
     Condition A uses indentation only - no conversion needed, just extraction.
