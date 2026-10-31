@@ -15,7 +15,15 @@ from enum import Enum
 from typing import List, Optional, Any
 from pathlib import Path
 
-from converter import convert_brace_to_python, ConversionError, ConversionResult
+import sys
+
+if __name__ == "__main__" and __package__ is None:
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
+try:
+    from src.spatial_tax.converter import convert_brace_to_python, ConversionError, ConversionResult
+except ImportError:
+    from converter import convert_brace_to_python, ConversionError, ConversionResult
 
 
 class Category(Enum):
@@ -524,7 +532,8 @@ def python_to_brace(canonical_python: str) -> str:
 def main():
     """Run self-test with demo tasks as reference."""
     # Load demo tasks as reference
-    with open('tasks/demo_tasks.json') as f:
+    demo_path = Path('tasks/pilot/demo_tasks.json') if Path('tasks/pilot/demo_tasks.json').exists() else Path('tasks/demo_tasks.json')
+    with open(demo_path) as f:
         demo_tasks = json.load(f)
     
     print("Running scorer self-test per §8...")
