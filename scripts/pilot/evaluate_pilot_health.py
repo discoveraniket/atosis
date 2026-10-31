@@ -232,6 +232,11 @@ def generate_health_summary(
         data = json.load(f)
 
     records = data.get("records", [])
+    if not records:
+        raise ValueError(
+            f"No evaluation records found in {eval_records_file}. "
+            "Cannot evaluate pilot health on empty or missing records (Guideline §5.7)."
+        )
 
     # Group by cell (depth × condition)
     cells_data: Dict[str, List[Dict[str, Any]]] = {}
