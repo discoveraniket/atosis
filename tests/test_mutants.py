@@ -132,5 +132,44 @@ class TestMutants(unittest.TestCase):
         self.assertTrue(result.passed)
 
 
+class TestGeneratorConstraints(unittest.TestCase):
+    """Verify Task Generator structural rules (§3)."""
+
+    def test_generator_header_constraints(self):
+        """
+        Verify:
+        1. for v2 in data: appears at most once per task.
+        2. <v> resolves to the innermost active loop variable (v2 if v2 is active, v1 otherwise).
+        3. No consecutive repeats of block header templates.
+        """
+        import random
+        from src.spatial_tax.generator import generate_candidate_task
+
+        for seed in range(50):
+            rng = random.Random(seed)
+            task = generate_candidate_task(f"test_{seed}", depth=5, rng=rng)
+            lines = [l.strip() for l in task.canonical_python.splitlines()]
+            headers = [l for l in lines if l.endswith(":")]
+
+            # 1. for v2 in data: at most once per task
+            v2_headers = [h for h in headers if "for v2 in data:" in h]
+            self.assertLessEqual(len(v2_headers), 1, f"Seed {seed} had multiple v2 loops: {headers}")
+
+            # 2. Innermost active loop variable resolution
+            seen_v2 = False
+            for h in headers:
+                if "for v2 in data:" in h:
+                    seen_v2 = True
+                if "v1 > 0" in h or "v1 % 2 == 0" in h:
+                    self.assertFalse(seen_v2, f"Seed {seed} used v1 after v2 was opened: {headers}")
+                if "v2 > 0" in h or "v2 % 2 == 0" in h:
+                    self.assertTrue(seen_v2, f"Seed {seed} used v2 before v2 was opened: {headers}")
+
+            # 3. No consecutive repeats of deeper header templates
+            for idx in range(len(headers) - 1):
+                h1, h2 = headers[idx], headers[idx + 1]
+                self.assertNotEqual(h1, h2, f"Consecutive repeat of header in seed {seed}: {h1}")
+
+
 if __name__ == "__main__":
     unittest.main()

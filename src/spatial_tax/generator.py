@@ -162,18 +162,33 @@ def generate_candidate_task(task_id: str, depth: int, rng: random.Random) -> Tas
             headers.append("for v1 in data:")
         else:
             available = DEEPER_HEADERS.copy()
-            if level > 1:
+
+            # Enforce §3: (at most once more per task) for v2 in data:
+            if any("for v2 in data:" in h for h in headers):
+                available = [h for h in available if h != "for v2 in data:"]
+
+            # Enforce §3: draw without consecutive repeats
+            if level > 0:
                 last = headers[-1]
-                if "if" in last and "% 2 == 0" in last:
-                    available = [h for h in available if not ("% 2 == 0" in h and "if" in h)]
-                elif "if" in last and "> 0" in last:
-                    available = [h for h in available if not ("> 0" in h and "if" in h)]
+                if "total % 2 == 0" in last:
+                    available = [h for h in available if h != "if total % 2 == 0:"]
+                elif "% 2 == 0" in last:
+                    available = [h for h in available if h != "if {v} % 2 == 0:"]
+                elif "> 0" in last and "len" not in last:
+                    available = [h for h in available if h != "if {v} > 0:"]
+                elif "for v2 in data:" in last:
+                    available = [h for h in available if h != "for v2 in data:"]
+
             header_template = rng.choice(available)
+
+            # Enforce §3: <v> is the innermost active loop variable
             if "{v}" in header_template:
-                if "v1" in " ".join(headers):
-                    header_template = header_template.replace("{v}", "v1")
+                if any("for v2 in data:" in h for h in headers):
+                    active_v = "v2"
                 else:
-                    header_template = header_template.replace("{v}", "v2")
+                    active_v = "v1"
+                header_template = header_template.replace("{v}", active_v)
+
             headers.append(header_template)
 
     # Generate statements per block with unique constants
