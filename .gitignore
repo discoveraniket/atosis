@@ -62,7 +62,14 @@ runs/
 wandb/
 mlruns/
 lightning_logs/
-results/
+results/*
+!results/pilot/
+results/pilot/*
+!results/pilot/determinism_check.json
+!results/pilot/raw_generations.json
+!results/pilot/evaluation_records.json
+!results/pilot/pilot_health_summary.json
+!results/pilot/extraction_hand_check_samples.json
 *.log
 
 # Unit test / coverage reports
