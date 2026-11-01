@@ -102,6 +102,61 @@ class TestRunInference(unittest.TestCase):
                 output_path=None,
             )
 
+    def test_run_pilot_inference_checkpoint_resume(self):
+        """Verify that run_pilot_inference resumes from checkpoint and avoids re-generating cached tasks."""
+        import tempfile
+        import json
+        from scripts.pilot.run_inference import run_pilot_inference
+
+        mock_runner = MagicMock()
+        mock_runner.threads = 16
+        mock_runner.generate.return_value = {
+            "output_raw": "    total = 0\n    return total",
+            "output_tokens": [10, 20],
+            "output_token_count": 2,
+            "output_sha256": "hash_fresh",
+            "generation_time_sec": 0.05,
+        }
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_out = Path(tmp_dir) / "raw_generations.json"
+            # Pre-populate checkpoint with 1 completed generation
+            initial_checkpoint = {
+                "metadata": {"total_generations": 1},
+                "generations": [
+                    {
+                        "task_id": "task_d1_000",
+                        "depth": 1,
+                        "condition": "A",
+                        "output_sha256": "hash_cached",
+                        "output_token_count": 10,
+                        "output_tokens": [1, 2],
+                        "output_raw": "cached output",
+                        "generation_time_sec": 0.01,
+                    }
+                ]
+            }
+            with open(tmp_out, "w", encoding="utf-8") as f:
+                json.dump(initial_checkpoint, f)
+
+            # Run pilot inference on official tasks
+            demo_path = Path("tasks/pilot/demo_tasks.json")
+            test_path = Path("tasks/pilot/test_tasks.json")
+
+            summary = run_pilot_inference(
+                runner=mock_runner,
+                test_tasks_path=test_path,
+                demo_tasks_path=demo_path,
+                output_path=tmp_out,
+            )
+
+            # Total generations must be 270
+            self.assertEqual(len(summary["generations"]), 270)
+            # The first generation should be the cached one
+            self.assertEqual(summary["generations"][0]["output_sha256"], "hash_cached")
+            # runner.generate should only have been called 269 times (skipped the 1 cached generation)
+            self.assertEqual(mock_runner.generate.call_count, 269)
+
 
 if __name__ == "__main__":
     unittest.main()

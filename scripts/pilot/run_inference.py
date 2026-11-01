@@ -293,6 +293,24 @@ def run_pilot_inference(
     git_commit = get_git_commit_hash()
     timestamp_start = datetime.now(timezone.utc).isoformat()
 
+    # Check for existing checkpoint to resume from interruptions
+    completed_map: Dict[Tuple[str, str], Dict[str, Any]] = {}
+    if output_path:
+        out_p = Path(output_path)
+        if out_p.exists():
+            try:
+                with open(out_p, "r", encoding="utf-8") as f:
+                    existing_payload = json.load(f)
+                for r in existing_payload.get("generations", []):
+                    tid = r.get("task_id")
+                    cond = r.get("condition")
+                    if tid and cond and "output_sha256" in r:
+                        completed_map[(tid, cond)] = r
+                if completed_map:
+                    print(f"Found checkpoint at {out_p}: Loaded {len(completed_map)} existing generations. Resuming...")
+            except Exception as e:
+                print(f"Warning: Could not load existing checkpoint from {out_p} ({e}). Starting fresh.")
+
     print("\n" + "=" * 70)
     print(f"STARTING OFFICIAL PILOT INFERENCE (§5): {len(tasks)} tasks × 3 conditions = {len(tasks) * 3} generations")
     print(f"Git Commit: {git_commit}")
@@ -302,12 +320,50 @@ def run_pilot_inference(
     total_generations = len(tasks) * len(PINNED_CONDITIONS)
     gen_idx = 0
 
+    def save_checkpoint(final: bool = False) -> None:
+        if not output_path:
+            return
+        out_p = Path(output_path)
+        out_p.parent.mkdir(parents=True, exist_ok=True)
+        summary = {
+            "metadata": {
+                "pilot": "H2 Spatial Tax Pilot",
+                "git_commit": git_commit,
+                "timestamp_start": timestamp_start,
+                "timestamp_end": datetime.now(timezone.utc).isoformat() if final else None,
+                "status": "COMPLETED" if final else "IN_PROGRESS",
+                "model_name": PINNED_MODEL_NAME,
+                "model_revision": PINNED_REVISION,
+                "precision": "bfloat16",
+                "cpu_threads": runner.threads,
+                "seed": PINNED_SEED,
+                "max_new_tokens": PINNED_MAX_NEW_TOKENS,
+                "total_tasks": len(tasks),
+                "total_generations": len(records),
+                "conditions": PINNED_CONDITIONS,
+            },
+            "generations": records,
+        }
+        tmp_p = out_p.with_suffix(".tmp")
+        with open(tmp_p, "w", encoding="utf-8") as f:
+            json.dump(summary, f, indent=2)
+        tmp_p.replace(out_p)
+
     for task in tasks:
         task_id = task["task_id"]
         depth = task["depth"]
 
         for condition in PINNED_CONDITIONS:
             gen_idx += 1
+            prompt_key = (task_id, condition)
+
+            # Skip generation if already present in checkpoint
+            if prompt_key in completed_map:
+                record = completed_map[prompt_key]
+                records.append(record)
+                print(f"[{gen_idx:03d}/{total_generations:03d}] Task {task_id} (d={depth}, Cond {condition})... [RESUMED from checkpoint]")
+                continue
+
             prompt_text = build_prompt(demos, task, condition)
             prompt_hash = sha256_text(prompt_text)
 
@@ -328,17 +384,22 @@ def run_pilot_inference(
                 "generation_time_sec": gen_result["generation_time_sec"],
             }
             records.append(record)
+            completed_map[prompt_key] = record
 
             print(f" -> {gen_result['output_token_count']} tokens ({gen_result['generation_time_sec']:.2f}s)")
+            save_checkpoint(final=False)
 
-    timestamp_end = datetime.now(timezone.utc).isoformat()
+    save_checkpoint(final=True)
+    if output_path:
+        print(f"\nAll {len(records)} raw generations saved to: {output_path}")
 
-    summary = {
+    return {
         "metadata": {
             "pilot": "H2 Spatial Tax Pilot",
             "git_commit": git_commit,
             "timestamp_start": timestamp_start,
-            "timestamp_end": timestamp_end,
+            "timestamp_end": datetime.now(timezone.utc).isoformat(),
+            "status": "COMPLETED",
             "model_name": PINNED_MODEL_NAME,
             "model_revision": PINNED_REVISION,
             "precision": "bfloat16",
@@ -351,15 +412,6 @@ def run_pilot_inference(
         },
         "generations": records,
     }
-
-    if output_path:
-        out_p = Path(output_path)
-        out_p.parent.mkdir(parents=True, exist_ok=True)
-        with open(out_p, "w", encoding="utf-8") as f:
-            json.dump(summary, f, indent=2)
-        print(f"\nRaw generations saved to: {out_p}")
-
-    return summary
 
 
 def main():
