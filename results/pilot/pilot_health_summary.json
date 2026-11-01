@@ -1,0 +1,222 @@
+{
+  "timestamp": "2026-11-01T07:46:38.289703+00:00",
+  "total_generations_evaluated": 270,
+  "cells": {
+    "d1_A": {
+      "total_generations": 30,
+      "category_1_count": 0,
+      "category_2_count": 0,
+      "category_3_count": 30,
+      "truncated_count": 0,
+      "parse_failure_count": 0,
+      "e_placement_count": 0,
+      "e_other_count": 0,
+      "pass_at_1_count": 30,
+      "colon_brace_count": 0,
+      "content_error_count": 0,
+      "upper_bound_structural_failure_rate": 0.0,
+      "lower_bound_structural_failure_rate": 0.0,
+      "e_other_rate": 0.0,
+      "parse_failure_rate": 0.0,
+      "truncation_rate": 0.0,
+      "pass_at_1_rate": 1.0
+    },
+    "d1_B": {
+      "total_generations": 30,
+      "category_1_count": 0,
+      "category_2_count": 0,
+      "category_3_count": 30,
+      "truncated_count": 0,
+      "parse_failure_count": 0,
+      "e_placement_count": 0,
+      "e_other_count": 0,
+      "pass_at_1_count": 30,
+      "colon_brace_count": 0,
+      "content_error_count": 0,
+      "upper_bound_structural_failure_rate": 0.0,
+      "lower_bound_structural_failure_rate": 0.0,
+      "e_other_rate": 0.0,
+      "parse_failure_rate": 0.0,
+      "truncation_rate": 0.0,
+      "pass_at_1_rate": 1.0
+    },
+    "d1_C": {
+      "total_generations": 30,
+      "category_1_count": 0,
+      "category_2_count": 0,
+      "category_3_count": 30,
+      "truncated_count": 0,
+      "parse_failure_count": 0,
+      "e_placement_count": 0,
+      "e_other_count": 0,
+      "pass_at_1_count": 30,
+      "colon_brace_count": 0,
+      "content_error_count": 0,
+      "upper_bound_structural_failure_rate": 0.0,
+      "lower_bound_structural_failure_rate": 0.0,
+      "e_other_rate": 0.0,
+      "parse_failure_rate": 0.0,
+      "truncation_rate": 0.0,
+      "pass_at_1_rate": 1.0
+    },
+    "d3_A": {
+      "total_generations": 30,
+      "category_1_count": 0,
+      "category_2_count": 0,
+      "category_3_count": 30,
+      "truncated_count": 0,
+      "parse_failure_count": 0,
+      "e_placement_count": 0,
+      "e_other_count": 0,
+      "pass_at_1_count": 30,
+      "colon_brace_count": 0,
+      "content_error_count": 0,
+      "upper_bound_structural_failure_rate": 0.0,
+      "lower_bound_structural_failure_rate": 0.0,
+      "e_other_rate": 0.0,
+      "parse_failure_rate": 0.0,
+      "truncation_rate": 0.0,
+      "pass_at_1_rate": 1.0
+    },
+    "d3_B": {
+      "total_generations": 30,
+      "category_1_count": 0,
+      "category_2_count": 0,
+      "category_3_count": 30,
+      "truncated_count": 0,
+      "parse_failure_count": 0,
+      "e_placement_count": 0,
+      "e_other_count": 0,
+      "pass_at_1_count": 30,
+      "colon_brace_count": 0,
+      "content_error_count": 0,
+      "upper_bound_structural_failure_rate": 0.0,
+      "lower_bound_structural_failure_rate": 0.0,
+      "e_other_rate": 0.0,
+      "parse_failure_rate": 0.0,
+      "truncation_rate": 0.0,
+      "pass_at_1_rate": 1.0
+    },
+    "d3_C": {
+      "total_generations": 30,
+      "category_1_count": 2,
+      "category_2_count": 5,
+      "category_3_count": 23,
+      "truncated_count": 0,
+      "parse_failure_count": 2,
+      "e_placement_count": 0,
+      "e_other_count": 5,
+      "pass_at_1_count": 22,
+      "colon_brace_count": 0,
+      "content_error_count": 2,
+      "upper_bound_structural_failure_rate": 0.2333,
+      "lower_bound_structural_failure_rate": 0.0667,
+      "e_other_rate": 0.1667,
+      "parse_failure_rate": 0.0667,
+      "truncation_rate": 0.0,
+      "pass_at_1_rate": 0.7333
+    },
+    "d5_A": {
+      "total_generations": 30,
+      "category_1_count": 0,
+      "category_2_count": 16,
+      "category_3_count": 14,
+      "truncated_count": 0,
+      "parse_failure_count": 0,
+      "e_placement_count": 0,
+      "e_other_count": 16,
+      "pass_at_1_count": 19,
+      "colon_brace_count": 0,
+      "content_error_count": 0,
+      "upper_bound_structural_failure_rate": 0.5333,
+      "lower_bound_structural_failure_rate": 0.0,
+      "e_other_rate": 0.5333,
+      "parse_failure_rate": 0.0,
+      "truncation_rate": 0.0,
+      "pass_at_1_rate": 0.6333
+    },
+    "d5_B": {
+      "total_generations": 30,
+      "category_1_count": 8,
+      "category_2_count": 4,
+      "category_3_count": 18,
+      "truncated_count": 0,
+      "parse_failure_count": 8,
+      "e_placement_count": 0,
+      "e_other_count": 4,
+      "pass_at_1_count": 17,
+      "colon_brace_count": 0,
+      "content_error_count": 2,
+      "upper_bound_structural_failure_rate": 0.4,
+      "lower_bound_structural_failure_rate": 0.2667,
+      "e_other_rate": 0.1333,
+      "parse_failure_rate": 0.2667,
+      "truncation_rate": 0.0,
+      "pass_at_1_rate": 0.5667
+    },
+    "d5_C": {
+      "total_generations": 30,
+      "category_1_count": 16,
+      "category_2_count": 7,
+      "category_3_count": 7,
+      "truncated_count": 0,
+      "parse_failure_count": 16,
+      "e_placement_count": 1,
+      "e_other_count": 6,
+      "pass_at_1_count": 8,
+      "colon_brace_count": 0,
+      "content_error_count": 0,
+      "upper_bound_structural_failure_rate": 0.7667,
+      "lower_bound_structural_failure_rate": 0.5667,
+      "e_other_rate": 0.2,
+      "parse_failure_rate": 0.5333,
+      "truncation_rate": 0.0,
+      "pass_at_1_rate": 0.2667
+    }
+  },
+  "health_check_gates": {
+    "all_gates_passed": false,
+    "gates": {
+      "d1_pass_rate_floor": {
+        "target": ">= 0.40 in best-performing condition",
+        "observed_rates": {
+          "A": 1.0,
+          "B": 1.0,
+          "C": 1.0
+        },
+        "best_rate": 1.0,
+        "passed": true
+      },
+      "d1_pass_rate_ceiling": {
+        "target": "<= 0.90 pooled across conditions",
+        "pooled_rate": 1.0,
+        "passed": false
+      },
+      "d5_pass_rate_floor": {
+        "target": "> 0.05 in best-performing condition",
+        "observed_rates": {
+          "A": 0.6333,
+          "B": 0.5667,
+          "C": 0.2667
+        },
+        "best_rate": 0.6333,
+        "passed": true
+      },
+      "d1_parse_failures": {
+        "target": "< 0.10 per cell at d=1",
+        "observed_rates": {
+          "A": 0.0,
+          "B": 0.0,
+          "C": 0.0
+        },
+        "passed": true
+      },
+      "truncation_rate": {
+        "target": "< 0.05 per cell",
+        "max_observed_rate": 0.0,
+        "passed": true
+      }
+    }
+  },
+  "overall_status": "FAIL"
+}
