@@ -170,7 +170,12 @@ class TestConverterRoundTrip(unittest.TestCase):
             return
 
         with open(test_path) as f:
-            test_tasks = json.load(f)
+            test_tasks_data = json.load(f)
+
+        if isinstance(test_tasks_data, dict) and "tasks" in test_tasks_data:
+            test_tasks = test_tasks_data["tasks"]
+        else:
+            test_tasks = test_tasks_data
 
         failures = []
         for task in test_tasks:

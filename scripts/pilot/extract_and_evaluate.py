@@ -326,9 +326,18 @@ def evaluate_generations_file(
         infer_data = json.load(f)
 
     with open(tasks_file, encoding="utf-8") as f:
-        tasks = json.load(f)
+        tasks_data = json.load(f)
 
-    tasks_by_id = {t["task_id"]: t for t in tasks}
+    if isinstance(tasks_data, dict) and "tasks" in tasks_data:
+        task_list = tasks_data["tasks"]
+    elif isinstance(tasks_data, list):
+        task_list = tasks_data
+    else:
+        raise ValueError(
+            f"Unexpected format for tasks file {tasks_file}: expected list or dict with 'tasks' key."
+        )
+
+    tasks_by_id = {t["task_id"]: t for t in task_list}
 
     eval_records = []
     generations = infer_data.get("generations", [])
