@@ -312,7 +312,7 @@ def run_pilot_inference(
                 print(f"Warning: Could not load existing checkpoint from {out_p} ({e}). Starting fresh.")
 
     print("\n" + "=" * 70)
-    print(f"STARTING OFFICIAL PILOT INFERENCE (§5): {len(tasks)} tasks × 3 conditions = {len(tasks) * 3} generations")
+    print(f"STARTING PILOT INFERENCE (§5): {len(tasks)} tasks × 3 conditions = {len(tasks) * 3} generations")
     print(f"Git Commit: {git_commit}")
     print("=" * 70)
 
@@ -424,7 +424,7 @@ def main():
     parser.add_argument(
         "--run-pilot",
         action="store_true",
-        help="Execute official pilot inference on test tasks across all 3 conditions (270 generations).",
+        help="Execute pilot inference on test tasks across all 3 conditions (270 generations).",
     )
     parser.add_argument(
         "--test-tasks",
